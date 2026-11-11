@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tsion &amp; Bruk — Wedding Invitation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --burgundy: #6e0f1f;
+    --burgundy-dark: #4a0812;
+    --burgundy-light: #8c1a2c;
+    --gold: #c9a24f;
+    --gold-light: #f3dc9b;
+    --ink: #5c0d1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: #2a0308; }
+  body {
+    font-family: "Cormorant Garamond", serif;
+    color: var(--ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- Animated sparkle background ---------- */
+  .bg {
+    position: fixed; inset: -5%;
+    background: url("assets/red-sparkle.jpg") center / cover no-repeat;
+    animation: kenburns 22s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+  @keyframes kenburns {
+    from { transform: scale(1) translate(0, 0); filter: brightness(.9); }
+    to   { transform: scale(1.15) translate(-2%, 2%); filter: brightness(1.1); }
+  }
+  .vignette {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(20,0,4,.75) 100%);
+  }
+  #sparkles { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+
+  /* ---------- Envelope stage ---------- */
+  .stage {
+    position: fixed; inset: 0; z-index: 5;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2.2rem;
+    transition: opacity 1s ease, transform 1.2s cubic-bezier(.6,0,.4,1);
+  }
+  .stage.leave { opacity: 0; transform: translateY(30vh) scale(.9); pointer-events: none; }
+
+  .intro-text {
+    font-family: "Cinzel", serif; letter-spacing: .35em; font-size: .8rem;
+    color: var(--gold-light); text-transform: uppercase; text-align: center;
+    opacity: 0; animation: fadeUp 1.4s .3s ease forwards;
+  }
+  .intro-text b { display: block; font-family: "Great Vibes", cursive; font-weight: 400;
+    font-size: 2.6rem; letter-spacing: 0; text-transform: none; margin-top: .3rem;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+    background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 4s linear infinite; }
+
+  .envelope-wrap {
+    width: min(90vw, 480px);
+    aspect-ratio: 518 / 285;
+    margin-top: 8vh;
+    cursor: pointer;
+    opacity: 0;
+    animation: floatIn 1.4s .6s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .envelope {
+    position: relative; width: 100%; height: 100%;
+    perspective: 1200px;
+    animation: bob 4s ease-in-out 2s infinite;
+  }
+  .opened .envelope { animation: none; }
+
+  .env-body, .env-pocket {
+    position: absolute; inset: 0;
+    background: url("assets/env-body.png") center / 100% 100% no-repeat;
+  }
+  .env-body { z-index: 1; filter: drop-shadow(0 25px 30px rgba(0,0,0,.6)); }
+  .env-pocket {
+    z-index: 3; pointer-events: none;
+    clip-path: polygon(0 1%, 7.1% 3.7%, 14.3% 13.5%, 21.4% 23.7%, 28.6% 33.9%, 32.4% 38.1%,
+                       67.6% 38.1%, 71.4% 33.9%, 78.6% 23.4%, 85.7% 9.7%, 92.9% 2%, 100% 1%, 100% 100%, 0 100%);
+  }
+
+  .flap-closed, .flap-open {
+    position: absolute; left: 0; width: 100%;
+    background: center / 100% 100% no-repeat;
+    pointer-events: none;
+  }
+  .flap-closed {
+    top: 0; height: 91.2%; z-index: 4;
+    background-image: url("assets/env-flap-closed.png");
+    transform-origin: top center;
+    filter: drop-shadow(0 4px 5px rgba(0,0,0,.35));
+    transition: transform .6s cubic-bezier(.55,0,1,.45), filter .6s, visibility 0s;
+  }
+  .flap-open {
+    bottom: 100%; height: 76.8%; z-index: 1;
+    background-image: url("assets/env-flap-open.png");
+    transform-origin: bottom center;
+    transform: rotateX(-90deg);
+    visibility: hidden;
+    transition: transform 0s, visibility 0s;
+  }
+  .opened .flap-closed {
+    transform: rotateX(90deg); filter: brightness(1.3) drop-shadow(0 4px 5px rgba(0,0,0,.35));
+    visibility: hidden;
+    transition: transform .6s cubic-bezier(.55,0,1,.45), filter .6s, visibility 0s .6s;
+  }
+  .opened .flap-open {
+    transform: rotateX(0deg); visibility: visible;
+    transition: transform .7s .6s cubic-bezier(0,.55,.45,1), visibility 0s .6s;
+  }
+
+  .mini-card {
+    position: absolute; left: 6%; right: 6%; top: 4%; height: 92%;
+    z-index: 2; border-radius: 4px; overflow: hidden;
+    background: url("assets/card-bg.jpg") center 40% / cover;
+    box-shadow: 0 4px 14px rgba(0,0,0,.35);
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    transition: transform 1.3s cubic-bezier(.5,0,.2,1);
+  }
+  .mini-card span { font-family: "Great Vibes", cursive; font-size: clamp(1.4rem, 6vw, 2.2rem); color: var(--burgundy); }
+  .mini-card small { font-family: "Cinzel", serif; font-size: .6rem; letter-spacing: .3em; color: var(--burgundy-light); }
+  .opened.step-card .mini-card { transform: translateY(-70%); }
+
+  .seal {
+    position: absolute; left: 50%; top: 76%; z-index: 6;
+    width: 17%; aspect-ratio: 1; transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f6e2a6, #c9a24f 45%, #8a6420 80%);
+    box-shadow:
+      0 0 0 3px rgba(138,100,32,.9),
+      0 0 0 6px rgba(201,162,79,.5),
+      0 6px 14px rgba(0,0,0,.5),
+      inset 0 -4px 8px rgba(0,0,0,.35),
+      inset 0 3px 6px rgba(255,255,255,.5);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Great Vibes", cursive; color: #6b4a12;
+    font-size: clamp(1.1rem, 5.5vw, 2rem);
+    text-shadow: 0 1px 0 rgba(255,255,255,.5), 0 -1px 0 rgba(0,0,0,.25);
+    animation: pulse 2.2s ease-in-out infinite;
+    transition: transform .7s cubic-bezier(.5,-0.4,.5,1), opacity .6s;
+  }
+  .seal::before {
+    content: ""; position: absolute; inset: 12%; border-radius: 50%;
+    border: 1px dashed rgba(107,74,18,.6);
+  }
+  .opened .seal { animation: none; transform: translate(-50%, -50%) scale(1.6) rotate(25deg); opacity: 0; }
+
+  .tap-hint {
+    font-family: "Cinzel", serif; font-size: .75rem; letter-spacing: .4em;
+    color: var(--gold-light); opacity: 0;
+    animation: fadeUp 1s 1.8s forwards, blink 2s 2.8s ease-in-out infinite;
+  }
+  .stage.opened .tap-hint, .stage.opened .intro-text { animation: fadeOut .6s ease forwards; }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-12px); } }
+
+  /* ---------- Invitation card ---------- */
+  .invite-wrap {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .invite-wrap.show { opacity: 1; pointer-events: auto; }
+
+  .invite {
+    position: relative;
+    width: min(100vw, calc(100dvh * 9 / 16));
+    aspect-ratio: 9 / 16;
+    container-type: inline-size;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6);
+    transform: scale(.55) translateY(20%);
+    transition: transform 1.6s cubic-bezier(.2,.8,.2,1);
+  }
+  .invite-wrap.show .invite { transform: none; }
+  .invite-bg {
+    position: absolute; inset: 0;
+    background: url("assets/card-bg.jpg") center / cover;
+    animation: breathe 9s ease-in-out infinite alternate;
+  }
+  @keyframes breathe { from { transform: scale(1); } to { transform: scale(1.04); } }
+  .invite-glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 30%, rgba(255,240,200,.45) 50%, transparent 70%);
+    background-size: 250% 100%; mix-blend-mode: soft-light;
+    animation: sweep 6s ease-in-out infinite;
+  }
+  #petals { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+
+  .content {
+    position: absolute; inset: 0; z-index: 2;
+    padding: 24cqw 15cqw 22cqw;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .content > * { opacity: 0; transform: translateY(14px); }
+  .invite-wrap.show .content > * { animation: fadeUp 1.2s cubic-bezier(.2,.8,.2,1) forwards; }
+  .invite-wrap.show .content > *:nth-child(1) { animation-delay: 1.2s; }
+  .invite-wrap.show .content > *:nth-child(2) { animation-delay: 1.6s; }
+  .invite-wrap.show .content > *:nth-child(3) { animation-delay: 2.0s; }
+  .invite-wrap.show .content > *:nth-child(4) { animation-delay: 2.3s; }
+  .invite-wrap.show .content > *:nth-child(5) { animation-delay: 2.6s; }
+  .invite-wrap.show .content > *:nth-child(6) { animation-delay: 3.0s; }
+  .invite-wrap.show .content > *:nth-child(7) { animation-delay: 3.3s; }
+  .invite-wrap.show .content > *:nth-child(8) { animation-delay: 3.6s; }
+  .invite-wrap.show .content > *:nth-child(9) { animation-delay: 3.9s; }
+  .invite-wrap.show .content > *:nth-child(10) { animation-delay: 4.2s; }
+
+  .eyebrow { font-family: "Cinzel", serif; font-size: 3.1cqw; letter-spacing: .3em; color: var(--burgundy-light); }
+  .lead { font-style: italic; font-size: 4.4cqw; margin-top: 2cqw; color: var(--ink); }
+  .name {
+    font-family: "Great Vibes", cursive; font-weight: 400; line-height: 1;
+    font-size: 17cqw;
+    background: linear-gradient(90deg, var(--burgundy) 0%, #a8273b 25%, var(--gold) 50%, #a8273b 75%, var(--burgundy) 100%);
+    background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 5s linear infinite;
+    filter: drop-shadow(0 1px 0 rgba(255,255,255,.6));
+  }
+  .invite-wrap.show .content > .name { animation: fadeUp 1.2s cubic-bezier(.2,.8,.2,1) forwards, shimmer 5s linear infinite; }
+  .amp { font-family: "Great Vibes", cursive; font-size: 9cqw; color: var(--gold); line-height: 1; margin: -1cqw 0; }
+  .divider { width: 46cqw; height: 6cqw; margin: 3cqw 0 1cqw; }
+  .divider path { stroke: var(--gold); stroke-width: 1; fill: none; stroke-dasharray: 200; stroke-dashoffset: 200; }
+  .invite-wrap.show .divider path { animation: draw 2.2s 3s ease forwards; }
+  .request { font-size: 4.2cqw; line-height: 1.35; color: var(--ink); }
+  .date {
+    display: flex; align-items: center; gap: 3cqw; margin-top: 4cqw;
+    font-family: "Cinzel", serif; color: var(--burgundy);
+  }
+  .date .side { font-size: 3.2cqw; letter-spacing: .2em; padding: 1.2cqw 0; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); width: 18cqw; }
+  .date .day { font-size: 12cqw; line-height: 1; font-weight: 600; }
+  .date .month { font-size: 3.4cqw; letter-spacing: .3em; margin-top: 2cqw; }
+  .venue { margin-top: 3.5cqw; font-family: "Cinzel", serif; font-size: 4.2cqw; letter-spacing: .18em; color: var(--burgundy); }
+  .venue small { display: block; font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 3.6cqw; letter-spacing: 0; color: var(--burgundy-light); }
+  .countdown { display: flex; gap: 2.4cqw; margin-top: 5cqw; }
+  .countdown div {
+    width: 13cqw; padding: 1.6cqw 0; border-radius: 1.5cqw;
+    background: rgba(110,15,31,.9); color: var(--gold-light);
+    box-shadow: inset 0 0 0 1px rgba(201,162,79,.6);
+  }
+  .countdown b { display: block; font-family: "Cinzel", serif; font-size: 4.6cqw; font-weight: 600; }
+  .countdown span { font-size: 2.4cqw; letter-spacing: .15em; text-transform: uppercase; }
+
+  .replay {
+    position: fixed; right: 14px; bottom: 14px; z-index: 20;
+    font-family: "Cinzel", serif; font-size: .7rem; letter-spacing: .2em;
+    padding: .6rem 1rem; border-radius: 30px; cursor: pointer;
+    color: var(--gold-light); background: rgba(74,8,18,.75);
+    border: 1px solid rgba(201,162,79,.6); backdrop-filter: blur(4px);
+    opacity: 0; pointer-events: none; transition: opacity 1s 4s;
+  }
+  .invite-wrap.show ~ .replay { opacity: 1; pointer-events: auto; }
+
+  /* ---------- Keyframes ---------- */
+  @keyframes fadeUp { to { opacity: 1; transform: none; } }
+  @keyframes floatIn { from { opacity: 0; transform: translateY(40px) scale(.92); } to { opacity: 1; transform: none; } }
+  @keyframes bob { 0%,100% { transform: translateY(0) rotate(-.6deg); } 50% { transform: translateY(-10px) rotate(.6deg); } }
+  @keyframes pulse {
+    0%,100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.07); filter: brightness(1.15); }
+  }
+  @keyframes blink { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+  @keyframes shimmer { to { background-position: 200% center; } }
+  @keyframes sweep { 0% { background-position: 120% 0; } 60%,100% { background-position: -120% 0; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .3s !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="vignette"></div>
+  <canvas id="sparkles"></canvas>
+
+  <!-- Envelope -->
+  <section class="stage" id="stage">
+    <p class="intro-text">You are invited<b>Tsion &amp; Bruk</b></p>
+
+    <div class="envelope-wrap" id="envelope" role="button" tabindex="0" aria-label="Open the invitation">
+      <div class="envelope">
+        <div class="flap-open"></div>
+        <div class="env-body"></div>
+
+        <div class="mini-card">
+          <small>THE WEDDING OF</small>
+          <span>Tsion &amp; Bruk</span>
+        </div>
+
+        <div class="env-pocket"></div>
+        <div class="flap-closed"></div>
+
+        <div class="seal">T&amp;B</div>
+      </div>
+    </div>
+
+    <p class="tap-hint">TAP TO OPEN</p>
+  </section>
+
+  <!-- Invitation -->
+  <section class="invite-wrap" id="invite" aria-live="polite">
+    <article class="invite">
+      <div class="invite-bg"></div>
+      <div class="invite-glow"></div>
+      <div class="content">
+        <p class="eyebrow">TOGETHER WITH THEIR FAMILIES</p>
+        <h1 class="name">Tsion</h1>
+        <p class="amp">&amp;</p>
+        <h1 class="name">Bruk</h1>
+        <svg class="divider" viewBox="0 0 120 16">
+          <path d="M2,8 H48 M72,8 H118 M60,2 C54,8 54,8 60,14 C66,8 66,8 60,2 Z M48,8 C52,4 56,4 60,8 C64,12 68,12 72,8"/>
+        </svg>
+        <p class="request">request the honour of your presence<br/>as they celebrate their marriage</p>
+        <div class="date">
+          <div class="side">SUNDAY</div>
+          <div><div class="day">15</div><div class="month">NOVEMBER</div></div>
+          <div class="side">2026</div>
+        </div>
+        <p class="venue">CONVENTION CENTER<small>Reception to follow</small></p>
+        <div class="countdown" id="countdown">
+          <div><b id="cd-d">0</b><span>Days</span></div>
+          <div><b id="cd-h">0</b><span>Hrs</span></div>
+          <div><b id="cd-m">0</b><span>Min</span></div>
+          <div><b id="cd-s">0</b><span>Sec</span></div>
+        </div>
+      </div>
+      <canvas id="petals"></canvas>
+    </article>
+  </section>
+
+  <button class="replay" id="replay">↺ REPLAY</button>
+
+<script>
+  /* ---------- Gold sparkle particles (background) ---------- */
+  const sc = document.getElementById("sparkles"), sx = sc.getContext("2d");
+  let W, H, dots = [];
+  function resize() {
+    W = sc.width = innerWidth * devicePixelRatio;
+    H = sc.height = innerHeight * devicePixelRatio;
+  }
+  resize(); addEventListener("resize", resize);
+  for (let i = 0; i < 90; i++) dots.push(newDot(true));
+  function newDot(rand) {
+    return {
+      x: Math.random() * W, y: rand ? Math.random() * H : H + 10,
+      r: (Math.random() * 1.8 + .4) * devicePixelRatio,
+      vy: -(Math.random() * .4 + .1) * devicePixelRatio,
+      vx: (Math.random() - .5) * .2, t: Math.random() * 6.28, s: Math.random() * .04 + .01
+    };
+  }
+  function drawSparkles() {
+    sx.clearRect(0, 0, W, H);
+    dots.forEach((d, i) => {
+      d.x += d.vx; d.y += d.vy; d.t += d.s;
+      const a = .35 + Math.sin(d.t) * .35;
+      const g = sx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r * 4);
+      g.addColorStop(0, `rgba(255,230,160,${a})`); g.addColorStop(1, "rgba(255,200,100,0)");
+      sx.fillStyle = g; sx.beginPath(); sx.arc(d.x, d.y, d.r * 4, 0, 6.28); sx.fill();
+      if (d.y < -20) dots[i] = newDot(false);
+    });
+    requestAnimationFrame(drawSparkles);
+  }
+  drawSparkles();
+
+  /* ---------- Falling petals (on card) ---------- */
+  const pc = document.getElementById("petals"), px = pc.getContext("2d");
+  let petals = [], petalsOn = false;
+  function sizePetals() {
+    const r = pc.getBoundingClientRect();
+    pc.width = r.width * devicePixelRatio; pc.height = r.height * devicePixelRatio;
+  }
+  function newPetal(rand) {
+    return {
+      x: Math.random() * pc.width, y: rand ? Math.random() * -pc.height : -20,
+      s: (Math.random() * 6 + 6) * devicePixelRatio,
+      vy: (Math.random() * .6 + .4) * devicePixelRatio,
+      sway: Math.random() * 2 + 1, t: Math.random() * 6.28,
+      rot: Math.random() * 6.28, vr: (Math.random() - .5) * .04,
+      hue: Math.random() < .25 ? "gold" : "red"
+    };
+  }
+  function drawPetals() {
+    if (!petalsOn) return;
+    px.clearRect(0, 0, pc.width, pc.height);
+    petals.forEach((p, i) => {
+      p.t += .02; p.y += p.vy; p.x += Math.sin(p.t) * p.sway * .4; p.rot += p.vr;
+      px.save(); px.translate(p.x, p.y); px.rotate(p.rot);
+      px.scale(1, Math.abs(Math.sin(p.t * 1.5)) * .5 + .5);
+      const g = px.createLinearGradient(-p.s, 0, p.s, 0);
+      if (p.hue === "gold") { g.addColorStop(0, "#f3dc9b"); g.addColorStop(1, "#b8893a"); }
+      else { g.addColorStop(0, "#a8213a"); g.addColorStop(1, "#5c0a18"); }
+      px.fillStyle = g; px.globalAlpha = .85;
+      px.beginPath();
+      px.moveTo(0, -p.s);
+      px.bezierCurveTo(p.s, -p.s * .6, p.s * .8, p.s * .6, 0, p.s);
+      px.bezierCurveTo(-p.s * .8, p.s * .6, -p.s, -p.s * .6, 0, -p.s);
+      px.fill(); px.restore();
+      if (p.y > pc.height + 20) petals[i] = newPetal(false);
+    });
+    requestAnimationFrame(drawPetals);
+  }
+
+  /* ---------- Countdown ---------- */
+  const target = new Date("2026-11-15T00:00:00").getTime();
+  function tick() {
+    let diff = Math.max(0, target - Date.now());
+    const d = Math.floor(diff / 864e5); diff -= d * 864e5;
+    const h = Math.floor(diff / 36e5); diff -= h * 36e5;
+    const m = Math.floor(diff / 6e4); diff -= m * 6e4;
+    const s = Math.floor(diff / 1e3);
+    document.getElementById("cd-d").textContent = d;
+    document.getElementById("cd-h").textContent = String(h).padStart(2, "0");
+    document.getElementById("cd-m").textContent = String(m).padStart(2, "0");
+    document.getElementById("cd-s").textContent = String(s).padStart(2, "0");
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---------- Opening sequence ---------- */
+  const stage = document.getElementById("stage");
+  const env = document.getElementById("envelope");
+  const invite = document.getElementById("invite");
+  let opening = false, timers = [];
+
+  function openEnvelope() {
+    if (opening) return;
+    opening = true;
+    stage.classList.add("opened");
+    timers.push(setTimeout(() => stage.classList.add("step-card"), 1350));
+    timers.push(setTimeout(() => stage.classList.add("leave"), 3000));
+    timers.push(setTimeout(() => {
+      invite.classList.add("show");
+      sizePetals();
+      petals = Array.from({ length: 22 }, () => newPetal(true));
+      petalsOn = true; drawPetals();
+    }, 3200));
+  }
+  env.addEventListener("click", openEnvelope);
+  env.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openEnvelope(); } });
+  addEventListener("resize", () => petalsOn && sizePetals());
+
+  document.getElementById("replay").addEventListener("click", () => {
+    timers.forEach(clearTimeout); timers = [];
+    petalsOn = false; px.clearRect(0, 0, pc.width, pc.height);
+    invite.classList.remove("show");
+    stage.className = "stage";
+    opening = false;
+  });
+</script>
+</body>
+</html>
